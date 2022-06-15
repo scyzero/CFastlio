@@ -197,7 +197,18 @@ void pointBodyToWorld(const Matrix<T, 3, 1> &pi, Matrix<T, 3, 1> &po)
     po[2] = p_global(2);
 }
 
-void RGBpointBodyToWorld(PointType const * const pi, PointType * const po)
+//void RGBpointBodyToWorld(PointType const * const pi, PointType * const po)
+//{
+//    V3D p_body(pi->x, pi->y, pi->z);
+//    V3D p_global(state_point.rot * (state_point.offset_R_L_I*p_body + state_point.offset_T_L_I) + state_point.pos);
+//
+//    po->x = p_global(0);
+//    po->y = p_global(1);
+//    po->z = p_global(2);
+//    po->intensity = pi->intensity;
+//}
+
+void RGBpointBodyToWorld(PointTypeRGB const * const pi, PointTypeRGB * const po)
 {
     V3D p_body(pi->x, pi->y, pi->z);
     V3D p_global(state_point.rot * (state_point.offset_R_L_I*p_body + state_point.offset_T_L_I) + state_point.pos);
@@ -205,7 +216,9 @@ void RGBpointBodyToWorld(PointType const * const pi, PointType * const po)
     po->x = p_global(0);
     po->y = p_global(1);
     po->z = p_global(2);
-    po->intensity = pi->intensity;
+    po->r = pi->r;
+    po->g = pi->g;
+    po->b = pi->b;
 }
 
 void RGBpointBodyLidarToIMU(PointType const * const pi, PointType * const po)
@@ -342,38 +355,6 @@ void livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg)
     // 特征提取或间隔采样
     p_pre->process(msg, ptr);
     lidar_buffer.push_back(ptr); //储存处理后的lidar特征
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    cv::Mat X(4, 1, cv::DataType<double>::type);
-    cv::Mat Y(3, 1, cv::DataType<double>::type);
-
-    pcl::PointCloud<PointTypeRGB>::Ptr fusion_pcl_ptr(new pcl::PointCloud<PointTypeRGB>); //放在这里是因为，每次都需要重新初始化
-
-    for (int i = 0; i < ptr->points.size(); i++) {
-        X.at<double>(0, 0) = ptr->points[i].x;
-        X.at<double>(1, 0) = ptr->points[i].y;
-        X.at<double>(2, 0) = ptr->points[i].z;
-        X.at<double>(3, 0) = 1;
-        Y = intrisicMat * extrinsicMat_RT * X; //雷达坐标转换到相机坐标，相机坐标投影到像素坐标
-        cv::Point pt;                           // (x,y) 像素坐标
-        // Y是3*1向量，pt.x是Y的第一个值除以第三个值，pt.y是Y的第二个值除以第三个值，为什么是下面这种写法？？
-        pt.x = Y.at<double>(0, 0) / Y.at<double>(2, 0);
-        pt.y = Y.at<double>(1, 0) / Y.at<double>(2, 0);
-        // std::cout<<Y<<pt<<std::endl;
-        if (pt.x >= 0 && pt.x < W && pt.y >= 0 && pt.y < H &&
-            ptr->points[i].x > 0) //&& raw_pcl_ptr->points[i].x>0去掉图像后方的点云
-        {
-            PointTypeRGB p;
-            p.x = ptr->points[i].x;
-            p.y = ptr->points[i].y;
-            p.z = ptr->points[i].z;
-            //点云颜色由图像上对应点确定
-            p.b = image_color[pt.y][pt.x][0];
-            p.g = image_color[pt.y][pt.x][1];
-            p.r = image_color[pt.y][pt.x][2];
-            fusion_pcl_ptr->points.push_back(p);
-        }
-    }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     time_buffer.push_back(last_timestamp_lidar);
     
     s_plot11[scan_count] = omp_get_wtime() - preprocess_start_time;
@@ -539,15 +520,55 @@ void publish_frame_world(const ros::Publisher & pubLaserCloudFull)
         int size = laserCloudFullRes->points.size();
         PointCloudXYZI::Ptr laserCloudWorld( \
                         new PointCloudXYZI(size, 1));
+        PointCloudXYZRGB::Ptr laserCloudWorldRGB( \
+                        new PointCloudXYZRGB(size, 1));
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        cv::Mat X(4, 1, cv::DataType<double>::type);
+        cv::Mat Y(3, 1, cv::DataType<double>::type);
+
+        pcl::PointCloud<PointTypeRGB>::Ptr fusion_pcl_ptr(new pcl::PointCloud<PointTypeRGB> (size, 1)); //放在这里是因为，每次都需要重新初始化
+
+        for (int i = 0; i < laserCloudFullRes->points.size(); i++) {
+            X.at<double>(0, 0) = laserCloudFullRes->points[i].x;
+            X.at<double>(1, 0) = laserCloudFullRes->points[i].y;
+            X.at<double>(2, 0) = laserCloudFullRes->points[i].z;
+            X.at<double>(3, 0) = 1;
+            Y = intrisicMat * extrinsicMat_RT * X; //雷达坐标转换到相机坐标，相机坐标投影到像素坐标
+            cv::Point pt;                           // (x,y) 像素坐标
+            // Y是3*1向量，pt.x是Y的第一个值除以第三个值，pt.y是Y的第二个值除以第三个值，为什么是下面这种写法？？
+            pt.x = Y.at<double>(0, 0) / Y.at<double>(2, 0);
+            pt.y = Y.at<double>(1, 0) / Y.at<double>(2, 0);
+            // std::cout<<Y<<pt<<std::endl;
+            if (pt.x >= 0 && pt.x < W && pt.y >= 0 && pt.y < H &&
+                    laserCloudFullRes->points[i].x > 0) //&& raw_pcl_ptr->points[i].x>0去掉图像后方的点云
+            {
+                PointTypeRGB p;
+                p.x = laserCloudFullRes->points[i].x;
+                p.y = laserCloudFullRes->points[i].y;
+                p.z = laserCloudFullRes->points[i].z;
+                //点云颜色由图像上对应点确定
+                p.b = image_color[pt.y][pt.x][0];
+                p.g = image_color[pt.y][pt.x][1];
+                p.r = image_color[pt.y][pt.x][2];
+                //std::cout<<"p cloud"<<p.x<<p.y<<p.z<<(int)p.r<<(int)p.g<<(int)p.b<<std::endl;
+                fusion_pcl_ptr->points[i]=(p);
+
+            }
+        }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         for (int i = 0; i < size; i++)
         {
-            RGBpointBodyToWorld(&laserCloudFullRes->points[i], \
+            //pointBodyToWorld(&laserCloudFullRes->points[i], \
                                 &laserCloudWorld->points[i]);
-        }
+            //std::cout<<"in cloud"<<" "<<fusion_pcl_ptr->points[i].x<<" "<<fusion_pcl_ptr->points[i].y<<" "<<fusion_pcl_ptr->points[i].z<<" "<<(int)fusion_pcl_ptr->points[i].r<<" "<<(int)fusion_pcl_ptr->points[i].g<<" "<<(int)fusion_pcl_ptr->points[i].b<<" "<<std::endl;
+            RGBpointBodyToWorld(&fusion_pcl_ptr->points[i], \
+                                &laserCloudWorldRGB->points[i]);
+            //std::cout<<"out cloud"<<""<<laserCloudWorldRGB->points[i].x<<" "<<laserCloudWorldRGB->points[i].y<<" "<<laserCloudWorldRGB->points[i].z<<" "<<(int)laserCloudWorldRGB->points[i].r<<" "<<(int)laserCloudWorldRGB->points[i].g<<" "<<(int)laserCloudWorldRGB->points[i].b<<" "<<std::endl;
 
-        sensor_msgs::PointCloud2 laserCloudmsg;
-        pcl::toROSMsg(*laserCloudWorld, laserCloudmsg);
+        }
+       sensor_msgs::PointCloud2 laserCloudmsg;
+        pcl::toROSMsg(*laserCloudWorldRGB, laserCloudmsg);
         laserCloudmsg.header.stamp = ros::Time().fromSec(lidar_end_time);
         laserCloudmsg.header.frame_id = "camera_init";
         pubLaserCloudFull.publish(laserCloudmsg);
@@ -565,7 +586,7 @@ void publish_frame_world(const ros::Publisher & pubLaserCloudFull)
 
         for (int i = 0; i < size; i++)
         {
-            RGBpointBodyToWorld(&feats_undistort->points[i], \
+            pointBodyToWorld(&feats_undistort->points[i], \
                                 &laserCloudWorld->points[i]);
         }
         *pcl_wait_save += *laserCloudWorld;
@@ -610,7 +631,7 @@ void publish_effect_world(const ros::Publisher & pubLaserCloudEffect)
                     new PointCloudXYZI(effct_feat_num, 1));
     for (int i = 0; i < effct_feat_num; i++)
     {
-        RGBpointBodyToWorld(&laserCloudOri->points[i], \
+        pointBodyToWorld(&laserCloudOri->points[i], \
                             &laserCloudWorld->points[i]);
     }
     sensor_msgs::PointCloud2 laserCloudFullRes3;
@@ -948,7 +969,7 @@ int main(int argc, char** argv)
 
     CalibrationData();
     image_transport::ImageTransport it(nh);
-    image_transport::Subscriber sub = it.subscribe("/zed2/zed_node/left_raw/image_raw_color", 1, &imageCallback);
+    image_transport::Subscriber sub = it.subscribe("/zed2/zed_node/left_raw/image_raw_color", 1000000, &imageCallback);
 //------------------------------------------------------------------------------------------------------
     signal(SIGINT, SigHandle);
     ros::Rate rate(5000);

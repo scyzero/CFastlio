@@ -1,9 +1,0 @@
-# ninja log v5
-125194	135366	1655262219102941064	devel/lib/fast_lio/fastlio_mapping	166a3fe13bb25931
-2	16912	1655262100659154253	CMakeFiles/fastlio_mapping.dir/src/coloredlidar.cpp.o	4f7d62130aceba40
-1	12491	1655262096239161333	CMakeFiles/fastlio_mapping.dir/src/preprocess.cpp.o	5862867cfe1025b0
-1	125193	1655262208906961072	CMakeFiles/fastlio_mapping.dir/src/laserMapping.cpp.o	d8b102b3c781dcf6
-2	4624	1655262088375173757	CMakeFiles/fastlio_mapping.dir/include/ikd-Tree/ikd_Tree.cpp.o	2d15a0f46c8646a3
-14	4640	1655264676076626409	build.ninja	12e8d15ced679b8a
-7	84245	1655265867464604793	CMakeFiles/fastlio_mapping.dir/src/laserMapping.cpp.o	d8b102b3c781dcf6
-84246	95404	1655265878648530438	devel/lib/fast_lio/fastlio_mapping	b550b4ddde71b6a1
