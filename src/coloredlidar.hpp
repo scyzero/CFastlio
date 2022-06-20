@@ -50,22 +50,22 @@ void CalibrationData(void)
 {
 
     /*extrinsic
-    -0.248743  -0.967485  -0.0458282  0.6701
-    -0.357534  0.135691  -0.92399  0.891248
-     0.900164  -0.213451  -0.379661  0.41885
-     0  0  0  1*/
-    extrinsicMat_RT.at<double>(0, 0) = -0.0120078;
-    extrinsicMat_RT.at<double>(0, 1) = -0.999918;
-    extrinsicMat_RT.at<double>(0, 2) =  0.00452853;
-    extrinsicMat_RT.at<double>(0, 3) =  0.0653615;
-    extrinsicMat_RT.at<double>(1, 0) = -0.0804771;
-    extrinsicMat_RT.at<double>(1, 1) = -0.00354775;
-    extrinsicMat_RT.at<double>(1, 2) = -0.99675;
-    extrinsicMat_RT.at<double>(1, 3) =  0.135746;
-    extrinsicMat_RT.at<double>(2, 0) =  0.996684;
-    extrinsicMat_RT.at<double>(2, 1) = -0.0123332;
-    extrinsicMat_RT.at<double>(2, 2) = -0.0804278;
-    extrinsicMat_RT.at<double>(2, 3) = 0.0385729;
+    0.0285186 -0.999539 -0.0104295 0.0438889
+    -0.0222481 0.00979648 -0.999704 0.0521314
+    0.999346 0.0287422 -0.0219584 -0.0350395
+    0 0 0 1*/
+    extrinsicMat_RT.at<double>(0, 0) =  0.0285186;
+    extrinsicMat_RT.at<double>(0, 1) = -0.999539;
+    extrinsicMat_RT.at<double>(0, 2) = -0.0104295;
+    extrinsicMat_RT.at<double>(0, 3) =  0.0438889;
+    extrinsicMat_RT.at<double>(1, 0) = -0.0222481;
+    extrinsicMat_RT.at<double>(1, 1) =  0.00979648;
+    extrinsicMat_RT.at<double>(1, 2) = -0.999704;
+    extrinsicMat_RT.at<double>(1, 3) =  0.0521314;
+    extrinsicMat_RT.at<double>(2, 0) =  0.999346;
+    extrinsicMat_RT.at<double>(2, 1) =  0.0287422;
+    extrinsicMat_RT.at<double>(2, 2) = -0.0219584;
+    extrinsicMat_RT.at<double>(2, 3) = -0.0350395;
     extrinsicMat_RT.at<double>(3, 0) = 0.0;
     extrinsicMat_RT.at<double>(3, 1) = 0.0;
     extrinsicMat_RT.at<double>(3, 2) = 0.0;
@@ -78,41 +78,23 @@ void CalibrationData(void)
     Distortion
     -0.03932215166914082 0.0086586268606816 -0.000472530659073111 0.000197192778323369 -0.00477887733572879*/
 
-//    intrisicMat.at<double>(0, 0) = intrisic.at<double>(0, 0) = 1058.69;
-//    intrisicMat.at<double>(0, 1) = 0.000000e+00;
-//    intrisicMat.at<double>(0, 2) = intrisic.at<double>(0, 2) = 975.13;
-//    intrisicMat.at<double>(0, 3) = 0.000000e+00;
-//    intrisicMat.at<double>(1, 0) = 0.000000e+00;
-//    intrisicMat.at<double>(1, 1) = intrisic.at<double>(1, 1) = 1058.14;
-//    intrisicMat.at<double>(1, 2) = intrisic.at<double>(1, 2) = 549.112;
-//    intrisicMat.at<double>(1, 3) = 0.000000e+00;
-//    intrisicMat.at<double>(2, 0) = 0.000000e+00;
-//    intrisicMat.at<double>(2, 1) = 0.000000e+00;
-//    intrisicMat.at<double>(2, 2) = 1.000000e+00;
-//    intrisicMat.at<double>(2, 3) = 0.000000e+00;
-//    distCoeffs.at<double>(0) = -0.0434855;
-//    distCoeffs.at<double>(1) =  0.0127718;
-//    distCoeffs.at<double>(2) = -0.000706572;
-//    distCoeffs.at<double>(3) = -0.000540132;
-//    distCoeffs.at<double>(4) = -0.00585071;
-
-    intrisicMat.at<double>(0, 0) = intrisic.at<double>(0, 0) = 264.917131590431;
+    intrisicMat.at<double>(0, 0) = intrisic.at<double>(0, 0) = 1058.69;
     intrisicMat.at<double>(0, 1) = 0.000000e+00;
-    intrisicMat.at<double>(0, 2) = intrisic.at<double>(0, 2) = 338.438059923329;
+    intrisicMat.at<double>(0, 2) = intrisic.at<double>(0, 2) = 975.13;
     intrisicMat.at<double>(0, 3) = 0.000000e+00;
     intrisicMat.at<double>(1, 0) = 0.000000e+00;
-    intrisicMat.at<double>(1, 1) = intrisic.at<double>(1, 1) = 264.68750251825658;
-    intrisicMat.at<double>(1, 2) = intrisic.at<double>(1, 2) = 188.590759170673;
+    intrisicMat.at<double>(1, 1) = intrisic.at<double>(1, 1) = 1058.14;
+    intrisicMat.at<double>(1, 2) = intrisic.at<double>(1, 2) = 549.112;
     intrisicMat.at<double>(1, 3) = 0.000000e+00;
     intrisicMat.at<double>(2, 0) = 0.000000e+00;
     intrisicMat.at<double>(2, 1) = 0.000000e+00;
     intrisicMat.at<double>(2, 2) = 1.000000e+00;
     intrisicMat.at<double>(2, 3) = 0.000000e+00;
-    distCoeffs.at<double>(0) = -0.039322174784366894;
-    distCoeffs.at<double>(1) = 0.00865862599874981;
-    distCoeffs.at<double>(2) = -0.000472520615585947;
-    distCoeffs.at<double>(3) = 0.000197192681519818;
-    distCoeffs.at<double>(4) = -0.00477887456516;
+    distCoeffs.at<double>(0) = -0.0434855;
+    distCoeffs.at<double>(1) =  0.0127718;
+    distCoeffs.at<double>(2) = -0.000706572;
+    distCoeffs.at<double>(3) = -0.000540132;
+    distCoeffs.at<double>(4) = -0.00585071;
 
 }
 
